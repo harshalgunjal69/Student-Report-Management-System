@@ -88,7 +88,7 @@ try:
 except Exception as e:
     error_trigger_update_total = e
 
-# trigger for updating total value when any row is updated
+# trigger for updating CGPA value when any row is updated
 try:
     cursor.execute("CREATE TRIGGER after_update_CGPA "
                    "BEFORE UPDATE ON students FOR EACH ROW "
