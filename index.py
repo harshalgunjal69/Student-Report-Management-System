@@ -3,14 +3,12 @@ import sys
 import mysql.connector
 from prettytable import SINGLE_BORDER, PrettyTable
 
-
 # connecting to MySql
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    passwd="admin"
+    passwd=input("Enter password for root user : ")
 )
-
 
 # checking if connection made successfully or not
 if mydb.is_connected():
@@ -18,15 +16,12 @@ if mydb.is_connected():
 else:
     print("\nSomething went wrong.....")
 
-
 # making the cursor object
 cursor = mydb.cursor()
-
 
 # creating the database
 cursor.execute("CREATE DATABASE IF NOT EXISTS project")
 cursor.execute("USE project")
-
 
 # creating the table
 cursor.execute(
@@ -43,10 +38,8 @@ cursor.execute(
     "total DOUBLE(4,1), "
     "CGPA DOUBLE(4,1))")
 
-
 # updating the total and CGPA column
-total_marks = "UPDATE students SET total = math_marks+phy_marks+" \
-              "chem_marks+eng_marks+comp_marks"
+total_marks = "UPDATE students SET total = math_marks+phy_marks+chem_marks+eng_marks+comp_marks"
 
 cursor.execute(total_marks)
 mydb.commit()
@@ -56,49 +49,33 @@ CGPA_marks = "UPDATE students SET CGPA = (total/5)/8"
 cursor.execute(CGPA_marks)
 mydb.commit()
 
-
 # creating a trigger for updating total value as soon as a new row is inserted
 try:
-    cursor.execute("CREATE TRIGGER total "
-                   "BEFORE INSERT ON students FOR EACH ROW "
-                   "SET NEW.total = NEW.math_marks + NEW.phy_marks + "
-                   "NEW.chem_marks + NEW.eng_marks + NEW.comp_marks ;")
+    cursor.execute("CREATE TRIGGER total BEFORE INSERT ON students FOR EACH ROW SET NEW.total = NEW.math_marks + NEW.phy_marks + NEW.chem_marks + NEW.eng_marks + NEW.comp_marks ;")
     mydb.commit()
 except Exception as e:
     error_trigger_insert_total = e
 
-
 # creating a trigger for updating CGPA value as soon as a new row is inserted
 try:
-    cursor.execute("CREATE TRIGGER cgpa "
-                   "BEFORE INSERT ON students FOR EACH ROW "
-                   "SET NEW.CGPA = ((NEW.math_marks + NEW.phy_marks + " 
-                   "NEW.chem_marks + NEW.eng_marks + NEW.comp_marks)/5)/8 ;")
+    cursor.execute("CREATE TRIGGER cgpa BEFORE INSERT ON students FOR EACH ROW SET NEW.CGPA = ((NEW.math_marks + NEW.phy_marks + NEW.chem_marks + NEW.eng_marks + NEW.comp_marks)/5)/8 ;")
     mydb.commit()
 except Exception as e:
     error_trigger_insert_cgpa = e
 
 # trigger for updating total value when any row is updated
 try:
-    cursor.execute("CREATE TRIGGER after_update_total "
-                   "BEFORE UPDATE ON students FOR EACH ROW "
-                   "SET NEW.total = NEW.math_marks + NEW.phy_marks + "
-                   "NEW.chem_marks + NEW.eng_marks + NEW.comp_marks ;")
-    mydb.commit()    
+    cursor.execute("CREATE TRIGGER after_update_total BEFORE UPDATE ON students FOR EACH ROW SET NEW.total = NEW.math_marks + NEW.phy_marks + NEW.chem_marks + NEW.eng_marks + NEW.comp_marks ;")
+    mydb.commit()
 except Exception as e:
     error_trigger_update_total = e
 
 # trigger for updating CGPA value when any row is updated
 try:
-    cursor.execute("CREATE TRIGGER after_update_CGPA "
-                   "BEFORE UPDATE ON students FOR EACH ROW "
-                   "SET NEW.CGPA = ((NEW.math_marks + NEW.phy_marks + " 
-                   "NEW.chem_marks + NEW.eng_marks + NEW.comp_marks)/5)/8 ")
-    mydb.commit()    
+    cursor.execute("CREATE TRIGGER after_update_CGPA BEFORE UPDATE ON students FOR EACH ROW SET NEW.CGPA = ((NEW.math_marks + NEW.phy_marks + NEW.chem_marks + NEW.eng_marks + NEW.comp_marks)/5)/8 ")
+    mydb.commit()
 except Exception as e:
     error_trigger_update_cgpa = e
-
-
 
 
 # defining all the functions
@@ -111,17 +88,16 @@ def execute(qry):
 
 def display(table_data, choice):
     """
-    Takes the table data in the form of list and 
-    prints a table out of it for the choices 1 & 2.
+    Takes in the table data and 
+    choice prints a table out of it.
     """
     table = PrettyTable()
 
     if choice == 1 or choice == 2:
-        headings = ["Adm no.", "Roll no.", "Student Name", "Maths Marks", "Physics Marks",
-                    "Chemistry Marks", "English Marks", "Computer marks", "Total", "CGPA"]
+        headings = ["Adm no.", "Roll no.", "Student Name", "Maths Marks", "Physics Marks", "Chemistry Marks", "English Marks", "Computer marks", "Total", "CGPA"]
     elif choice == 3:
-        headings = ["Rank", "Roll no.", "Student Name", "Maths Marks", "Physics Marks",
-                    "Chemistry Marks", "English Marks", "Computer marks", "Total", "CGPA"]
+        headings = ["Rank", "Roll no.", "Student Name", "Maths Marks", "Physics Marks", "Chemistry Marks", "English Marks", "Computer marks", "Total", "CGPA"]
+
     table.field_names = headings
 
     for i in table_data:
@@ -142,24 +118,20 @@ def view_all(_class):
     flag = 0
     choice = 1
     try:
-        qry = "SELECT adm_no, roll_no, student_name, math_marks, phy_marks, " \
-              "chem_marks, eng_marks, comp_marks, total, CGPA FROM students " \
-              "WHERE class = {} ORDER BY roll_no".format(_class)
+        qry = "SELECT adm_no, roll_no, student_name, math_marks, phy_marks, chem_marks, eng_marks, comp_marks, total, CGPA FROM students WHERE class = {} ORDER BY roll_no".format(_class)
         execute(qry)
         data = cursor.fetchall()
     except Exception as e:
-        print("\n", e)
+        print("\n------ Error : ", e, " ------")
         flag = 1
 
     if flag == 0:
         if data == []:
-            print("\nValue not found. " 
-                  "Please check if this is present in database.")
+            print("\n---------- Value not found. Please check if this is present in database. ----------")
         else:
             display(data, choice)
     else:
-        print("\nOops!!! Something went wrong."
-              "Please check your input data and try again.")
+        print("\n--------- Oops!!! Something went wrong. Please check your input data and try again. ---------")
 
 
 def check(_class, _rollno):
@@ -170,24 +142,20 @@ def check(_class, _rollno):
     flag = 0
     choice = 2
     try:
-        qry = "SELECT adm_no, roll_no, student_name, math_marks, phy_marks, "\
-              "chem_marks, eng_marks, comp_marks, total, CGPA FROM students "\
-              "WHERE class = {} AND roll_no = {}".format(_class, _rollno)
+        qry = "SELECT adm_no, roll_no, student_name, math_marks, phy_marks, chem_marks, eng_marks, comp_marks, total, CGPA FROM students WHERE class = {} AND roll_no = {}".format(_class, _rollno)
         execute(qry)
         data = cursor.fetchall()
     except Exception as e:
-        print("\n", e)
+        print("\n------ Error : ", e, " ------")
         flag = 1
     if flag == 0:
         if data == []:
-            print("\nValue not found. " 
-                  "Please check if this is present in database.")
+            print("\n---------- Value not found. Please check if this is present in database. ----------")
         else:
             display(data, choice)
             print("\n")
     else:
-        print("\nOops!!! Something went wrong."
-              "Please check your input data and try again.")
+        print("\n--------- Oops!!! Something went wrong. Please check your input data and try again. ---------")
 
 
 def topper(_class):
@@ -198,25 +166,20 @@ def topper(_class):
     flag = 0
     choice = 3
     try:
-        qry = "SELECT RANK() over (ORDER BY CGPA DESC) Rankings, roll_no, " \
-              "student_name, math_marks, phy_marks, chem_marks, eng_marks, " \
-              "comp_marks, total, CGPA FROM students WHERE class = {} " \
-              "ORDER BY CGPA DESC LIMIT 3".format(_class)
+        qry = "SELECT RANK() over (ORDER BY CGPA DESC) Rankings, roll_no, student_name, math_marks, phy_marks, chem_marks, eng_marks, comp_marks, total, CGPA FROM students WHERE class = {} ORDER BY CGPA DESC LIMIT 3".format(_class)
         execute(qry)
         data = cursor.fetchall()
     except Exception as e:
-        print("\n", e)
+        print("\n------ Error : ", e, " ------")
         flag = 1
     if flag == 0:
         if data == []:
-            print("\nValue not found. " 
-                  "Please check if this is present in database.")
+            print("\n---------- Value not found. Please check if this is present in database. ----------")
         else:
             display(data, choice)
             print("\n")
     else:
-        print("\nOops!!! Something went wrong."
-              "Please check your input data and try again.")
+        print("\n--------- Oops!!! Something went wrong. Please check your input data and try again. ---------")
 
 
 def add(list_of_data):
@@ -226,29 +189,25 @@ def add(list_of_data):
     """
     flag = 0
     try:
-        qry = "INSERT INTO students (adm_no, class, roll_no, student_name, " \
-              "math_marks, phy_marks, chem_marks, eng_marks, comp_marks) " \
-              "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        qry = "INSERT INTO students (adm_no, class, roll_no, student_name, math_marks, phy_marks, chem_marks, eng_marks, comp_marks) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         dat = list_of_data
         cursor.executemany(qry, dat)
         mydb.commit()
         if cursor.rowcount == 0:
-            print("\nValue not found. "
-                  "Please check if this is present in database.")
+            print("\n---------- Value not found. Please check if this is present in database. ----------")
         else:
-            print("\n", cursor.rowcount, " row(s) added successfully.")
+            print("\n------ ", cursor.rowcount, " row(s) added successfully. ------")
     except Exception as e:
-        print("\n", e)
+        print("\n------ Error : ", e, " ------")
         flag = 1
     if flag != 0:
-        print("\nOops!!! Something went wrong." 
-              "Please check your input data and try again.")
+        print("\n--------- Oops!!! Something went wrong. This value was not inserted. ---------")
 
 
 def update(_class, _rollno, adm_no):
     """
-    Takes in the class and roll non as arguments
-    and updates the details of a single student.
+    Takes in the class, roll no. amd adm no. as 
+    arguments and updates the details of a single student.
     """
     print(
         "\n-----Enter what you want to update-----\n"
@@ -261,7 +220,7 @@ def update(_class, _rollno, adm_no):
         "\n7) English Marks"
         "\n8) Computer science Marks"
         "\n9) Exit the update section"
-        )
+    )
     choice = input('\nEnter your choice - ')
 
     if not choice.isnumeric():
@@ -318,35 +277,26 @@ def update(_class, _rollno, adm_no):
 
 def _update(new, value, _class, _rollno, adm_no):
     """
-    Takes in the updated value, name of value, class
-    and roll no. of the students and updates the value.
+    Takes in the updated value, name of value, class, roll no. 
+    and adm no. of the students and updates the value.
     """
     flag = 0
     try:
         if value == "student_name":
-            qry = "UPDATE students SET {} = '{}' WHERE class = {} " \
-                  "AND roll_no = {} AND adm_no = {}".format(
-                    value, new, _class, _rollno, adm_no
-                )
+            qry = "UPDATE students SET {} = '{}' WHERE class = {} AND roll_no = {} AND adm_no = {}".format(value, new, _class, _rollno, adm_no)
         else:
-            qry = "UPDATE students SET {} = '{}' WHERE class = {} "\
-                  "AND roll_no = {} AND adm_no = {}".format(
-                    value, new, _class, _rollno, adm_no
-                )
+            qry = "UPDATE students SET {} = '{}' WHERE class = {} AND roll_no = {} AND adm_no = {}".format(value, new, _class, _rollno, adm_no)
         execute(qry)
         mydb.commit()
         if cursor.rowcount == 1:
-            print("\nData updated successfully.")
+            print("\n------- Data updated successfully. ------")
         else:
-            print("\nEither you've entered the same value as the previous "
-                  "value or there is no such value present in the database. "
-                  "Plz try again.")
+            print("\n------ Either you've entered the same value as the previous value or there is no such value present in the database. Plz try again. ------")
     except Exception as e:
-        print("\n", e)
+        print("\n------ Error : ", e, " ------")
         flag = 1
     if flag != 0:
-        print("\nOops!!! Something went wrong. "
-              "Please check your input data and try again.")
+        print("\n--------- Oops!!! Something went wrong. Please check your input data and try again. ---------")
 
 
 def delete(_class, _rollno):
@@ -361,16 +311,14 @@ def delete(_class, _rollno):
         execute(qry)
         mydb.commit()
         if cursor.rowcount == 1:
-            print("\nData deleted successfully.")
+            print("\n--------- Data deleted successfully. ---------")
         else:
-            print("\nValue not found. " 
-                  "Please check if this is present in database.")
+            print("\n---------- Value not found. Please check if this is present in database. ----------")
     except Exception as e:
-        print("\n", e)
+        print("\n------ Error : ", e, " ------")
         flag = 1
     if flag != 0:
-        print("\nOops!!! Something went wrong. "
-              "Please check your input data and try again.")
+        print("\n--------- Oops!!! Something went wrong. Please check your input data and try again. ---------")
         start()
 
 
@@ -389,15 +337,15 @@ def start():
     """
     print('\n')
     print(
-        "#### WELCOME TO STUDENT REPORT MANAGEMENT SYSTEM ####\n"
-        "\nEnter 1 : To view details of all Students"
-        "\nEnter 2 : To check details of a particular Student"
-        "\nEnter 3 : To view the Toppers' list"
-        "\nEnter 4 : To add new Students"
-        "\nEnter 5 : To update data of a Student"
-        "\nEnter 6 : To delete the data of a Student"
-        "\nEnter 7 : To commit all changes and exit"
-        )
+        "##########  WELCOME TO STUDENT REPORT MANAGEMENT SYSTEM  ##########\n"
+        "\n          Enter 1 : To view details of all Students"
+        "\n          Enter 2 : To check details of a particular Student"
+        "\n          Enter 3 : To view the Toppers' list"
+        "\n          Enter 4 : To add new Students"
+        "\n          Enter 5 : To update data of a Student"
+        "\n          Enter 6 : To delete the data of a Student"
+        "\n          Enter 7 : To commit all changes and exit\n"
+    )
 
     choice = input('\nEnter your choice - ')
 
