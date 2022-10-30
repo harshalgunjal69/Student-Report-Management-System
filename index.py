@@ -65,6 +65,11 @@ try:
     mydb.commit()
 except Exception as e:
     error_trigger_insert_total = e
+    code = e.errno
+    if code==1359:
+        pass
+    else:
+        print(e)
 
 # creating a trigger for updating CGPA value as soon as a new row is inserted
 try:
@@ -75,6 +80,11 @@ try:
     mydb.commit()
 except Exception as e:
     error_trigger_insert_cgpa = e
+    code = e.errno
+    if code==1359:
+        pass
+    else:
+        print(e)
 
 # trigger for updating total value when any row is updated
 try:
@@ -85,6 +95,11 @@ try:
     mydb.commit()
 except Exception as e:
     error_trigger_update_total = e
+    code = e.errno
+    if code==1359:
+        pass
+    else:
+        print(e)
 
 # trigger for updating CGPA value when any row is updated
 try:
@@ -95,6 +110,11 @@ try:
     mydb.commit()
 except Exception as e:
     error_trigger_update_cgpa = e
+    code = e.errno
+    if code==1359:
+        pass
+    else:
+        print(e)
 
 
 # defining all the functions
@@ -145,7 +165,7 @@ def view_all(_class):
         data = cursor.fetchall()
     except Exception as e:
         print("\n------ Error : ", e, " ------")
-        time.sleep(2)
+        time.sleep(1.5)
         flag = 1
 
     if flag == 0:
@@ -176,7 +196,7 @@ def check(_class, _rollno):
         data = cursor.fetchall()
     except Exception as e:
         print("\n------ Error : ", e, " ------")
-        time.sleep(2)
+        time.sleep(1.5)
         flag = 1
     if flag == 0:
         if data == []:
@@ -208,7 +228,7 @@ def topper(_class):
         data = cursor.fetchall()
     except Exception as e:
         print("\n------ Error : ", e, " ------")
-        time.sleep(2)
+        time.sleep(1.5)
         flag = 1
     if flag == 0:
         if data == []:
@@ -245,7 +265,7 @@ def add(list_of_data):
             print("\n------ ", cursor.rowcount, " row(s) added successfully. ------")
     except Exception as e:
         print("\n------ Error : ", e, " ------")
-        time.sleep(2)
+        time.sleep(1.5)
         flag = 1
     if flag != 0:
         print("\n--------- Oops!!! Something went wrong. "
@@ -278,42 +298,42 @@ def update(_class, _rollno, adm_no):
         time.sleep(1)
 
     elif int(choice) == 1:
-        nclass = input("Enter the new class of the student = ")
+        nclass = input("\nEnter the new class of the student = ")
         _update(nclass, "class", _class, _rollno, adm_no)
         update(nclass, _rollno, adm_no)
 
     elif int(choice) == 2:
-        nrollno = input("Enter the new rollno of the student = ")
+        nrollno = input("\nEnter the new rollno of the student = ")
         _update(nrollno, "roll_no", _class, _rollno, adm_no)
         update(_class, nrollno, adm_no)
 
     elif int(choice) == 3:
-        nname = input("Enter the new name of the student = ")
+        nname = input("\nEnter the new name of the student = ")
         _update(nname, "student_name", _class, _rollno, adm_no)
         update(_class, _rollno, adm_no)
 
     elif int(choice) == 4:
-        nmaths = input("Enter the new math marks of the student = ")
+        nmaths = input("\nEnter the new math marks of the student = ")
         _update(nmaths, "math_marks", _class, _rollno, adm_no)
         update(_class, _rollno, adm_no)
 
     elif int(choice) == 5:
-        nphy = input("Enter the new phy marks of the student = ")
+        nphy = input("\nEnter the new phy marks of the student = ")
         _update(nphy, "phy_marks", _class, _rollno, adm_no)
         update(_class, _rollno, adm_no)
 
     elif int(choice) == 6:
-        nchem = input("Enter the new chem marks of the student = ")
+        nchem = input("\nEnter the new chem marks of the student = ")
         _update(nchem, "chem_marks", _class, _rollno, adm_no)
         update(_class, _rollno, adm_no)
 
     elif int(choice) == 7:
-        neng = input("Enter the new eng marks of the student = ")
+        neng = input("\nEnter the new eng marks of the student = ")
         _update(neng, "eng_marks", _class, _rollno, adm_no)
         update(_class, _rollno, adm_no)
 
     elif int(choice) == 8:
-        ncs = input("Enter the new cs marks of the student = ")
+        ncs = input("\nEnter the new cs marks of the student = ")
         _update(ncs, "comp_marks", _class, _rollno, adm_no)
         update(_class, _rollno, adm_no)
 
@@ -355,7 +375,7 @@ def _update(new, value, _class, _rollno, adm_no):
             time.sleep(3)
     except Exception as e:
         print("\n------ Error : ", e, " ------")
-        time.sleep(2)
+        time.sleep(1.5)
         flag = 1
     if flag != 0:
         print("\n--------- Oops!!! Something went wrong. "
@@ -383,7 +403,7 @@ def delete(_class, _rollno):
             time.sleep(2)
     except Exception as e:
         print("\n------ Error : ", e, " ------")
-        time.sleep(2)
+        time.sleep(1.5)
         flag = 1
     if flag != 0:
         print("\n--------- Oops!!! Something went wrong. "
@@ -397,7 +417,7 @@ def exit():
     Commits all changes, disconnects the connection and exits.
     """
     print("\nThank you, and visit again.....")
-    time.sleep(3)
+    time.sleep(2)
     mydb.commit()
     mydb.close()
     sys.exit()
