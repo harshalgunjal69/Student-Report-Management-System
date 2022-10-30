@@ -1,17 +1,13 @@
 # importing the required modules
 import mysql.connector
-import maskpass
 import sys
 import time
-
-# getting the MySQL password
-password = maskpass.askpass(prompt="\nEnter password for root user : ")
 
 # connecting to MySql
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    passwd=password
+    passwd=input("\nEnter password for root user : ")
 )
 
 # making the cursor object
