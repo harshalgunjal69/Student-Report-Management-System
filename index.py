@@ -1,18 +1,14 @@
 # importing the required modules
 import sys
 import time
-import maskpass
 import mysql.connector
 from prettytable import SINGLE_BORDER, PrettyTable
-
-# getting the MySQL password
-password = maskpass.askpass(prompt="\nEnter password for root user : ")
 
 # connecting to MySql
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    passwd=password
+    passwd=input("\nEnter password for root user : ")
 )
 
 print("\nConnecting to the database........")
