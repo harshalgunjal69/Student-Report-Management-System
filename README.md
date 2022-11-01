@@ -3,7 +3,7 @@ This is a python programme named **"Student Report Management System"**.
 
 After downloading and unzipping the contents,
 
-1) download mysql-connector-python and prettytable modules using cmd :
+1) download mysql-connector-python, prettytable and maskpass modules using cmd :
 
     **pip install mysql-connector-python**
     
